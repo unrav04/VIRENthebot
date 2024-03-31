@@ -1,0 +1,400 @@
+// Motor A(RIGHT)
+int enA = 9;
+int in1 = 8;
+int in2 = 7;
+// Motor B(LEFT)
+int enB = 3;
+int in3 = 5;
+int in4 = 4;
+//--------------------------------------------------------
+//SERVO INISIALISATION
+#include <Servo.h>
+int trigPin = 11;    
+int echoPin = 12;    
+int pos = 50, x, y;
+float duration_us, distance_cm;
+Servo myservo;//OBJCET MYSERVO
+float location[100];
+//-------------------------------------------------------
+//FFT INISIALISATION 
+#include "arduinoFFT.h"
+const uint16_t samples = 128;
+const double samplingFrequency = 44100;  // Sample rate of your sound sample
+unsigned int samplingPeriod;
+unsigned long microSeconds;
+double vReal[samples];
+double vImg[samples];
+ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImg, samples, samplingFrequency);
+const int readingsCount = 10;
+double maxf;
+int f;
+double fu[3];
+
+//--------------------------------------------------------
+void setup() {
+  // put your setup code here, to run once:
+	// Set all the motor control pins to outputs
+	pinMode(enA, OUTPUT);
+	pinMode(enB, OUTPUT);
+	pinMode(in1, OUTPUT);
+	pinMode(in2, OUTPUT);
+	pinMode(in3, OUTPUT);
+	pinMode(in4, OUTPUT);
+	
+	// Turn off motors - Initial state
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  //BAUD RATE
+  Serial.begin (9600);
+  //CONNECT INPUT AND OUTPUT PINS
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  //SERVO TO PIN 6
+  myservo.attach(6);
+  myservo.write(50);
+  samplingPeriod = round(1000000 * (1.0 / samplingFrequency));
+}
+//-----------------------------------------------------------
+//FFT FUNCTION
+double performFFT(double desiredFrequency, int n) {
+    double sum = 0.0;
+
+    for (int j = 0; j < readingsCount; j++) {
+        for (int i = 0; i < samples; i++) {
+            microSeconds = micros();
+            vReal[i] = analogRead(n);
+            vImg[i] = 0;
+            while (micros() < (microSeconds + samplingPeriod)) {
+            }
+        }
+
+        FFT.windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+        FFT.compute(vReal, vImg, samples, FFT_FORWARD);
+        FFT.complexToMagnitude(vReal, vImg, samples);
+
+        int desiredBin = (desiredFrequency * samples) / samplingFrequency;
+        for(int i=0;i<=10;i++){
+        sum += vReal[desiredBin];}
+    }
+
+    return sum / readingsCount; // Return the moving average
+}
+//------------------------------------------------------------
+//MOTOR FUNCTION
+int motor(int f){
+  analogWrite(enA, 255);
+	analogWrite(enB, 255);
+  if(f==0){
+	// Turn on motor A & B
+	digitalWrite(in1, HIGH);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(1000);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);}
+  else if(f==1){
+  // Turn on motor A & B
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, HIGH);
+	digitalWrite(in4, LOW);
+	delay(1000);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);}  
+
+  //else{
+    // Turn on motor A & B
+	//digitalWrite(in1, HIGH);
+	//digitalWrite(in2, LOW);
+	//digitalWrite(in3, LOW);
+	//digitalWrite(in4, HIGH);
+	//delay(9800);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	//digitalWrite(in1, LOW);
+	//digitalWrite(in2, LOW);
+	//digitalWrite(in3, LOW);
+	//digitalWrite(in4, LOW);}
+  }
+  //---------------------------------
+  //motor forward
+  int motorfor(){
+  digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(1000);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  }
+  //----------------------------------------------
+  //SERVO-MOTOR
+  int motorservo(int y){
+    if(y>=0 && y<=20){
+      // Turn on motor A & B
+	digitalWrite(in1, HIGH);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(2000);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  
+  //straight for 3sec
+  digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(3000);
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  
+  digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, HIGH);
+	digitalWrite(in4, LOW);
+	delay(2000);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  }
+  else if(y>20 && y<50){
+     // Turn on motor A & B
+	digitalWrite(in1, HIGH);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(1500);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  
+  //straight for 3sec
+  digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(2500);
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+
+  digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, HIGH);
+	digitalWrite(in4, LOW);
+	delay(1500);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  }
+  else if(y>50 && y<=80){
+      // Turn on motor A & B
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, HIGH);
+	digitalWrite(in4, LOW);
+	delay(1500);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  
+  //straight for 3sec
+  digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(2500);
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+
+  digitalWrite(in1, HIGH);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(1500);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW); 
+  }
+  else{
+   digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, HIGH);
+	digitalWrite(in4, LOW);
+	delay(2000);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+  
+  //straight for 3sec
+  digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(3000);
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);
+
+  digitalWrite(in1, HIGH);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+	delay(2000);
+	
+	// Now change motor directions
+	
+	
+	// Turn off motors
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, LOW);  
+  }
+  }
+  
+void loop() {
+  // put your main code here, to run repeatedly:
+  double desiredFrequency = 2000;
+  for(int n = 0; n < 3; n++) {
+    fu[n] = performFFT(desiredFrequency, n);
+    }
+
+  maxf = fu[0];
+  f = 0;
+  for(int i = 0; i < 2; i++) {
+    if(maxf < fu[i+1]){
+       maxf = fu[i+1];
+       f = i+1;
+      }
+    }
+  motor(f);
+  myservo.write(50);
+  digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration_us = pulseIn(echoPin, HIGH);
+    distance_cm = duration_us/58;
+  if(distance_cm<30){
+    for (pos = 0; pos <= 100; pos += 1) { 
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration_us = pulseIn(echoPin, HIGH);
+    distance_cm = duration_us/58;
+    location[pos]=distance_cm;
+    //Serial.print(pos);
+    //Serial.print(" ");
+    //Serial.println(location[pos]);
+    myservo.write(pos);        
+    delay(50);                      
+  }
+   x=location[0];
+  y=0;
+  for (pos = 1; pos <= 100; pos += 1){
+    if(x<location[pos]){
+      x=location[pos];
+      y=pos;
+    }
+  }
+  motorservo(y);
+  }
+  else{
+    motorfor();
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration_us = pulseIn(echoPin, HIGH);
+    distance_cm = duration_us/58;
+  }
+}
+//PENIS
