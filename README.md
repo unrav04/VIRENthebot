@@ -1,4 +1,5 @@
 **ABOUT**
+
 While I was thinking of what to make for this project, I went through some ideas like Obstacle Avoidance, using ultra-sound sensors for a radar system, etc. Then I thought of my iPhone telling where my AirPods are in a room by pointing at the direction it is in, taking this as inspiration I thought of how I could recreate that using an Arduino, but then found out that the Bluetooth interphases that are available for the Arduino are only viable if the distance is above a meter, then I thought of how I could use a microphone instead to track a certain frequency. Thus this bot is created.
 
 **This bot uses Fourier transforms to convert the samples collected from the microphone to the frequency spectrum. After which we figure out which microphone has the highest amount of that frequency and the motors do the rest of the work of taking the bot towards it.**
