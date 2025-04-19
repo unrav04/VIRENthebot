@@ -32,7 +32,6 @@ double fu[3];
 
 //--------------------------------------------------------
 void setup() {
-  // put your setup code here, to run once:
 	// Set all the motor control pins to outputs
 	pinMode(enA, OUTPUT);
 	pinMode(enB, OUTPUT);
